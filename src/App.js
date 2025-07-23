@@ -5,19 +5,21 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h2>Creator console</h2>
+        {/* <img src={logo} className="App-logo" alt="logo" /> */}
       </header>
+      <div className='Text-editor'>
+        <h2>ADD TEXT</h2>
+        <div id='dropdown-panel'>
+          <input id='title-box' placeholder='title here'></input>
+        </div>
+        <div id='text-content' className='Content'>
+          <textarea type='text' placeholder='Your text here' id='main-text'></textarea>
+        </div>
+        <div id='exercise-content' className='Content'>
+          {/* TODO: exercise form here */}
+        </div>
+      </div>
     </div>
   );
 }

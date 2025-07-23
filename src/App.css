@@ -28,10 +28,42 @@
   color: #61dafb;
 }
 
+.Text-editor {
+  background-color: #282c34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#dropdown-panel {
+  background-color: "#3f4547";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.Content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+#main-text {
+  margin: 1%;
+  width: 50%;
+  min-height: 100px;
+  resize: vertical;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
