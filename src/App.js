@@ -1,26 +1,45 @@
 import logo from './logo.svg';
 import './App.css';
+import TextEditor from './TextEditor';
+import ContentManager from './ContentManager';
+import { useState } from 'react';
+
+const TEXT_EDITOR = "TEXT_EDITOR";
+const CONTENT_MANAGER = "CONTENT_MANAGER";
 
 function App() {
+  const [currScreen, setCurrScreen] = useState(TEXT_EDITOR)
+
+  function clickText() {
+    setCurrScreen(TEXT_EDITOR);
+  }
+  function clickContent() {
+    setCurrScreen(CONTENT_MANAGER);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         <h2>Creator console</h2>
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
-      </header>
-      <div className='Text-editor'>
-        <h2>ADD TEXT</h2>
-        <div id='dropdown-panel'>
-          <input id='title-box' placeholder='title here'></input>
-        </div>
-        <div id='text-content' className='Content'>
-          <textarea type='text' placeholder='Your text here' id='main-text'></textarea>
-        </div>
-        <div id='exercise-content' className='Content'>
-          {/* TODO: exercise form here */}
-        </div>
-      </div>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}>
+        <button className='Tab' onClick={clickText}>Text Editor</button>
+        <button className='Tab' onClick={clickContent}>Content Editor</button>
     </div>
+      </header >
+    { currScreen === TEXT_EDITOR ? (
+    <TextEditor activeTab={currScreen} />
+  ) : (
+    <ContentManager />
+  )
+}
+    </div >
   );
 }
 
