@@ -6,6 +6,8 @@ import RearrangeSentenceForm from "./components/exercise-forms/RearrangeSentence
 import OddOneOutForm from "./components/exercise-forms/OddOneOutForm";
 import Dropdown from "./components/Dropdown";
 import Tickbox from "./components/Tickbox";
+import { useDraft } from "./context/DraftStorage";
+import { addTextItem } from "shared-remote-utils";
 
 function generateId() {
   return Math.random().toString(36).substring(2, 10);
@@ -35,6 +37,8 @@ function ExerciseWrapper({ children, onRemove }) {
 }
 
 export default function TextEditor({ activeTab }) {
+  const { draft, setDraft } = useDraft(); // Access global draft state
+
   const [title, setTitle] = useState("");
   const [mainText, setMainText] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -49,22 +53,90 @@ export default function TextEditor({ activeTab }) {
   const [fillGaps, setFillGaps] = useState([]);
 
   useEffect(() => {
-    saveDraft();
-  }, [activeTab])
-
-  useEffect(() => {
     loadDraft();
-  }, [])
+  }, []);
+
+  // useEffect(() => {
+  //   return () => {
+  //     saveDraft();
+  //   };
+  // }, []);
+  useEffect(() => {
+    saveDraft();
+  }, [title, mainText, selectedTopic, selectedLevel, selectedLanguage, isFree, mltChoices, sntQuestions, rearSentences, oddOuts, fillGaps]);
+
+
+  function createJSONSave() {
+    let obj = {
+      textDetails: {
+        title,
+        topic: selectedTopic,
+        level: selectedLevel,
+        language: selectedLanguage,
+        content: mainText,
+        isFree
+      },
+    }
+    obj.exercises = [
+      {
+        type: "MULTIPLE_CHOICE",
+        tasks: mltChoices
+      },
+      {
+        type: "SENTENCE_QUESTION",
+        tasks: sntQuestions
+      },
+      {
+        type: "REARRANGE_SENTENCE",
+        tasks: rearSentences
+      },
+      {
+        type: "ODD_ONE_OUT",
+        tasks: oddOuts
+      },
+      {
+        type: "FILL_GAPS",
+        tasks: fillGaps
+      }
+    ]
+    return obj;
+  }
 
   const saveDraft = () => {
-    // TODO: implement
-    console.log("saving draft...")
-  }
+    const newDraft = createJSONSave();
+    setDraft(newDraft);
+    console.log("saving draft...", newDraft);
+  };
 
+  // When loading:
   const loadDraft = () => {
-    // TODO: implement
-    console.log("loading draft...")
-  }
+    if (!draft || Object.keys(draft).length === 0) {
+      console.log("No drafts saved");
+      return;
+    }
+    console.log("Loading draft:", draft);
+
+    const { textDetails, exercises } = draft;
+    console.log("Loading draft:", textDetails);
+
+    if (textDetails) {
+      setTitle(textDetails.title);
+      setMainText(textDetails.content);
+      setSelectedTopic(textDetails.selectedTopic);
+      setSelectedLevel(textDetails.selectedLevel);
+      setSelectedLanguage(textDetails.selectedLanguage);
+      setIsFree(textDetails.isFree || false);
+    }
+
+    if (Array.isArray(exercises)) {
+      setMltChoices(exercises.find(e => e.type === "MULTIPLE_CHOICE")?.tasks);
+      setSntQuestions(exercises.find(e => e.type === "SENTENCE_QUESTION")?.tasks);
+      setRearSentences(exercises.find(e => e.type === "REARRANGE_SENTENCE")?.tasks);
+      setOddOuts(exercises.find(e => e.type === "ODD_ONE_OUT")?.tasks);
+      setFillGaps(exercises.find(e => e.type === "FILL_GAPS")?.tasks);
+    }
+  };
+
 
   const addExercise = (setter, template) => {
     setter(prev => [...prev, { ...template, id: generateId() }]);
@@ -195,17 +267,20 @@ export default function TextEditor({ activeTab }) {
         ))}
       </div>
 
-      <button onClick={() => {
-        console.log(
-          "MultiChoices: ", mltChoices,
-          "SentenceQuestions: ", sntQuestions
-        );
+      <button onClick={async () => {
+        const res = await addTextItem(createJSONSave());
+        const status = res.status;
+        if (status === 400) {
+          alert("you havent done everyhting!");
+        } else if (status === 200) {
+          alert("text added successfuly!")
+        }
       }}>Submit</button>
     </div>
   );
 }
 
-function AddPanel({ buttonArr, saveCb }) {
+function AddPanel({ buttonArr }) {
   // a floating panel on the screen 
   return (
     <div className="Add-panel">

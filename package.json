@@ -3,26 +3,44 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3",
+    "electron": "^37.2.4",
+    "electron-builder": "^26.0.12",
+    "wait-on": "^8.0.4"
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-store": "^10.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
+    "shared-remote-utils": "file:../node-packages-local/shared-remote-utils",
     "web-vitals": "^2.1.4"
   },
   "main": "main.js",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "dev": "concurrently \"npm start\" \"npm run electron\""
+    "dev": "concurrently \"npm start\" \"npm run electron\"",
+    "build:react": "react-scripts build",
+    "build:electron": "wait-on build/index.html && electron-builder",
+    "build": "npm run build:react && npm run build:electron"
+  },
+  "build": {
+    "appId": "com.textworm.console",
+    "files": [
+      "build/**/*",
+      "public/electron.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   },
   "eslintConfig": {
     "extends": [
