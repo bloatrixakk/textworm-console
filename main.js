@@ -15,11 +15,10 @@ function createWindow() {
     },
   });
 
-  // Load your React app (dev or production)
-  win.loadURL('http://localhost:3000');
-  // win.loadFile('build/index.html'); // for prod
+  // win.loadURL('http://localhost:3000');
+  win.loadFile(path.join(__dirname, 'build', 'index.html'));
 
-  win.webContents.openDevTools(); // REMOVE THIS IN PRODUCTION
+  // win.webContents.openDevTools(); // REMOVE THIS IN PRODUCTION
 }
 
 app.whenReady().then(createWindow);

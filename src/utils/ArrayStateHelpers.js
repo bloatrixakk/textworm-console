@@ -11,3 +11,9 @@ export function removeStateArrElement(i, arr, setArr) {
 export function generateId() {
     return Math.random().toString(36).substring(2, 10);
   }
+
+export function addElement(val, arr, setArr) {
+  const arrCpy = [...arr];
+  arrCpy.push(val);
+  setArr(arrCpy);
+}

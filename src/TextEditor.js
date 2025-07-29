@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import MultipleChoiceForm from "./components/exercise-forms/multipleChoiceForm";
 import RemoveBtn from "./components/RemoveBtn";
 import SentenceQuestionForm from "./components/exercise-forms/SentenceQuestionForm";
@@ -7,7 +7,8 @@ import OddOneOutForm from "./components/exercise-forms/OddOneOutForm";
 import Dropdown from "./components/Dropdown";
 import Tickbox from "./components/Tickbox";
 import { useDraft } from "./context/DraftStorage";
-import { addTextItem } from "shared-remote-utils";
+import { addTextItem, updateTextItem } from "shared-remote-utils";
+import { getAndSetFilters } from "./utils/usefulFunctions";
 
 function generateId() {
   return Math.random().toString(36).substring(2, 10);
@@ -36,35 +37,41 @@ function ExerciseWrapper({ children, onRemove }) {
   );
 }
 
-export default function TextEditor({ activeTab }) {
-  const { draft, setDraft } = useDraft(); // Access global draft state
+export default function TextEditor() {
+  const {
+    title, setTitle,
+    mainText, setMainText,
+    selectedTopic, setSelectedTopic,
+    selectedLevel, setSelectedLevel,
+    selectedLanguage, setSelectedLanguage,
+    isFree, setIsFree,
 
-  const [title, setTitle] = useState("");
-  const [mainText, setMainText] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [isFree, setIsFree] = useState(false);
+    mltChoices, setMltChoices,
+    sntQuestions, setSntQuestions,
+    rearSentences, setRearSentences,
+    oddOuts, setOddOuts,
+    fillGaps, setFillGaps,
 
-  const [mltChoices, setMltChoices] = useState([]);
-  const [sntQuestions, setSntQuestions] = useState([]);
-  const [rearSentences, setRearSentences] = useState([]);
-  const [oddOuts, setOddOuts] = useState([]);
-  const [fillGaps, setFillGaps] = useState([]);
+    languages, setLanguages,
+    levels, setLevels,
+    topics, setTopics,
+
+    textEditorMode,
+    setUpdateMode,
+    setEditorMode,
+
+    resetVals,
+    id,
+
+    EDITOR_MODE, UPDATE_MODE
+  } = useDraft();
 
   useEffect(() => {
-    loadDraft();
+    async function loadFilters() {
+      getAndSetFilters(setLanguages, setLevels, setTopics);
+    }
+    loadFilters();
   }, []);
-
-  // useEffect(() => {
-  //   return () => {
-  //     saveDraft();
-  //   };
-  // }, []);
-  useEffect(() => {
-    saveDraft();
-  }, [title, mainText, selectedTopic, selectedLevel, selectedLanguage, isFree, mltChoices, sntQuestions, rearSentences, oddOuts, fillGaps]);
-
 
   function createJSONSave() {
     let obj = {
@@ -102,42 +109,6 @@ export default function TextEditor({ activeTab }) {
     return obj;
   }
 
-  const saveDraft = () => {
-    const newDraft = createJSONSave();
-    setDraft(newDraft);
-    console.log("saving draft...", newDraft);
-  };
-
-  // When loading:
-  const loadDraft = () => {
-    if (!draft || Object.keys(draft).length === 0) {
-      console.log("No drafts saved");
-      return;
-    }
-    console.log("Loading draft:", draft);
-
-    const { textDetails, exercises } = draft;
-    console.log("Loading draft:", textDetails);
-
-    if (textDetails) {
-      setTitle(textDetails.title);
-      setMainText(textDetails.content);
-      setSelectedTopic(textDetails.selectedTopic);
-      setSelectedLevel(textDetails.selectedLevel);
-      setSelectedLanguage(textDetails.selectedLanguage);
-      setIsFree(textDetails.isFree || false);
-    }
-
-    if (Array.isArray(exercises)) {
-      setMltChoices(exercises.find(e => e.type === "MULTIPLE_CHOICE")?.tasks);
-      setSntQuestions(exercises.find(e => e.type === "SENTENCE_QUESTION")?.tasks);
-      setRearSentences(exercises.find(e => e.type === "REARRANGE_SENTENCE")?.tasks);
-      setOddOuts(exercises.find(e => e.type === "ODD_ONE_OUT")?.tasks);
-      setFillGaps(exercises.find(e => e.type === "FILL_GAPS")?.tasks);
-    }
-  };
-
-
   const addExercise = (setter, template) => {
     setter(prev => [...prev, { ...template, id: generateId() }]);
   };
@@ -151,7 +122,7 @@ export default function TextEditor({ activeTab }) {
   };
 
   return (
-    <div id="text-editor">
+    <div id="text-editor" className=".Tab-content">
       <AddPanel
 
         buttonArr={
@@ -184,7 +155,18 @@ export default function TextEditor({ activeTab }) {
           ]}
       />
 
-      <h2 className="Text">ADD TEXT</h2>
+      {textEditorMode == EDITOR_MODE ?
+        <h2 className="Text">ADD TEXT</h2> :
+        <h2 className="Text">EDIT TEXT</h2>
+      }
+      {textEditorMode == UPDATE_MODE ?
+        <button
+          style={{ backgroundColor: "#FF474D" }}
+          onClick={() => {
+            setEditorMode();
+          }}>Switch to adding texts</button> :
+        null
+      }
 
       <div id="dropdown-panel">
         <input
@@ -195,20 +177,17 @@ export default function TextEditor({ activeTab }) {
           onChange={(e) => setTitle(e.target.value)}
         />
         <Dropdown
-          // TODO: fetch from cloud
-          options={['English', 'German', 'Russian']}
+          options={languages}
           selected={selectedLanguage}
           onSelect={setSelectedLanguage}
         />
         <Dropdown
-          // TODO: fetch from cloud
-          options={['Basic', 'Elementary', 'Intermediate']}
+          options={levels}
           selected={selectedLevel}
           onSelect={setSelectedLevel}
         />
         <Dropdown
-          // TODO: fetch from cloud
-          options={['Animals', 'Biography', 'Sports']}
+          options={topics}
           selected={selectedTopic}
           onSelect={setSelectedTopic}
         />
@@ -236,6 +215,7 @@ export default function TextEditor({ activeTab }) {
             <MultipleChoiceForm
               index={i + 1}
               data={item}
+              value={mltChoices[i]}
               onChange={(updated) => updateExercise(item.id, updated, setMltChoices)}
             />
           </ExerciseWrapper>
@@ -243,37 +223,49 @@ export default function TextEditor({ activeTab }) {
         <text className="Text">SENTENCE QUESTIONS</text>
         {sntQuestions.map((item, i) => (
           <ExerciseWrapper key={item.id} onRemove={() => removeExercise(item.id, setSntQuestions)}>
-            <SentenceQuestionForm index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setSntQuestions)} />
+            <SentenceQuestionForm value={sntQuestions[i]} index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setSntQuestions)} />
           </ExerciseWrapper>
         ))}
         <text className="Text">REARRANGE SENTENCES</text>
         {rearSentences.map((item, i) => (
           <ExerciseWrapper key={item.id} onRemove={() => removeExercise(item.id, setRearSentences)}>
-            <RearrangeSentenceForm index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setRearSentences)} />
+            <RearrangeSentenceForm value={rearSentences[i]} index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setRearSentences)} />
           </ExerciseWrapper>
         ))}
         <text className="Text">ODD ONE OUT</text>
         {oddOuts.map((item, i) => (
           <ExerciseWrapper key={item.id} onRemove={() => removeExercise(item.id, setOddOuts)}>
-            <OddOneOutForm index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setOddOuts)} />
+            <OddOneOutForm value={oddOuts[i]} index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setOddOuts)} />
           </ExerciseWrapper>
         ))}
         <text className="Text">FILL IN THE GAPS</text>
         {fillGaps.map((item, i) => (
           <ExerciseWrapper key={item.id} onRemove={() => removeExercise(item.id, setFillGaps)}>
             {/* reuse one form here */}
-            <RearrangeSentenceForm index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setFillGaps)} />
+            <RearrangeSentenceForm value={fillGaps[i]} index={i + 1} onChange={(updated) => updateExercise(item.id, updated, setFillGaps)} />
           </ExerciseWrapper>
         ))}
       </div>
 
       <button onClick={async () => {
-        const res = await addTextItem(createJSONSave());
-        const status = res.status;
-        if (status === 400) {
-          alert("you havent done everyhting!");
-        } else if (status === 200) {
-          alert("text added successfuly!")
+        if (textEditorMode == EDITOR_MODE) {
+          const res = await addTextItem(createJSONSave());
+          const status = res.status;
+          if (status === 400) {
+            alert("you havent filled everyhting in!");
+          } else if (status === 200) {
+            alert("text added successfuly!");
+          }
+        } else {
+          const params = createJSONSave();
+          params.textDetails.id = id;
+          const res = await updateTextItem(params);
+          if (res.status === 200) {
+            alert("updated successfully")
+            resetVals();
+          } else {
+            alert("error updating text");
+          }
         }
       }}>Submit</button>
     </div>

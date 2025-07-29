@@ -3,7 +3,7 @@ import { handleStateArrChange, removeStateArrElement } from "../../utils/ArraySt
 import OptionsElement from "../OptionElement";
 import AddBtn from "../AddBtn";
 
-export default function OddOneOutForm({ index, onChange }) {
+export default function OddOneOutForm({ value, index, onChange }) {
   const [options, setOptions] = useState(["", "", ""]);
 
   useEffect(() => {
@@ -13,6 +13,12 @@ export default function OddOneOutForm({ index, onChange }) {
       }
     );
   }, [options])
+
+  useEffect(() => {
+    if (Array.isArray(value?.options)) {
+      setOptions(value.options);
+    }
+  }, [])
 
   function addBtnClick() {
     // setOptions(prev => [...prev, `Answer${options.length + 1}`])

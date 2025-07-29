@@ -3,7 +3,7 @@ import { handleStateArrChange, removeStateArrElement } from "../../utils/ArraySt
 import OptionsElement from "../OptionElement";
 import AddBtn from "../AddBtn";
 
-export default function MultipleChoiceForm({ index, onChange }) {
+export default function MultipleChoiceForm({ value, index, onChange }) {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
 
@@ -15,6 +15,11 @@ export default function MultipleChoiceForm({ index, onChange }) {
       }
     );
   }, [options, question])
+
+  useEffect(() => {
+    setQuestion(value.question);
+    setOptions(value.options);
+  }, [])
 
   function addBtnClick() {
     // setOptions(prev => [...prev, `Answer${options.length + 1}`])

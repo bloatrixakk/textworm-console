@@ -1,15 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
 import TextEditor from './TextEditor';
-import ContentManager from './ContentManager';
+import ContentManager from './ConfigManager';
 import { useState, useEffect } from 'react';
 import { config } from 'shared-remote-utils';
 import LoginPage from './Login';
 import { init } from "shared-remote-utils";
 import { DraftProvider } from './context/DraftStorage';
+import TextBrowser from './TextBrowser';
 
 const TEXT_EDITOR = "TEXT_EDITOR";
-const CONTENT_MANAGER = "CONTENT_MANAGER";
+const CONFIG_MANAGER = "CONFIG_MANAGER";
+const TEXT_BROWSER = "TEXT_BROWSER";
 const LOGIN_SCREEN = "LOGIN_SCREEN";
 
 function App() {
@@ -41,24 +43,21 @@ function App() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-
-  //   }
-  // }, [isLoggedIn])
-
   function clickText() {
     if (isLoggedIn) setCurrScreen(TEXT_EDITOR);
   }
   function clickContent() {
-    if (isLoggedIn) setCurrScreen(CONTENT_MANAGER);
+    if (isLoggedIn) setCurrScreen(CONFIG_MANAGER);
+  }
+  function clickBrowser() {
+    if (isLoggedIn) setCurrScreen(TEXT_BROWSER);
   }
 
   return (
     <div className="App">
       <header className="App-header">
+
         <h2>Creator console</h2>
-        {/* <img src={logo} className="App-logo" alt="logo" /> */}
         <div style={{
           display: 'flex',
           flexDirection: 'row',
@@ -67,20 +66,26 @@ function App() {
           width: '100%',
         }}>
           <button className='Tab' onClick={clickText}>Text Editor</button>
-          <button className='Tab' onClick={clickContent}>Content Editor</button>
+          <button className='Tab' onClick={clickContent}>Config Manager</button>
+          <button className='Tab' onClick={clickBrowser}>Text Browser</button>
         </div>
       </header >
       <DraftProvider>
-
         {
           {
             TEXT_EDITOR: <TextEditor activeTab={currScreen} />,
             LOGIN_SCREEN: <LoginPage onLogin={setIsLoggedIn} />,
-            CONTENT_MANAGER: <ContentManager />
+            CONFIG_MANAGER: <ContentManager />,
+            TEXT_BROWSER: <TextBrowser editText={() => {
+              clickText();
+            }} />
           }[currScreen]
         }
       </DraftProvider>
-
+      <div style={{ position: "fixed", right: "30px", bottom: "10px", fontSize: "12px" }}>
+        <p className='Text'>Warning! drafts aren't saved between app reloads!</p>
+        <p className='Text'>Development build</p>
+      </div>
     </div >
   );
 }

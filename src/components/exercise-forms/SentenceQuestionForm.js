@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function SentenceQuestionForm({ index, onChange }) {
+export default function SentenceQuestionForm({ value, index, onChange }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
@@ -12,6 +12,11 @@ export default function SentenceQuestionForm({ index, onChange }) {
       }
     );
   }, [answer, question])
+
+  useEffect(() => {
+    setQuestion(value.question);
+    setAnswer(value.answer);
+  }, [])
 
   return (
     <div>

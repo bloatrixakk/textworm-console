@@ -1,6 +1,8 @@
 {
   "name": "textworm-console",
   "version": "0.1.0",
+  "description": "Desktop editor for textworm-app",
+  "author": "Bloatrix",
   "private": true,
   "devDependencies": {
     "concurrently": "^7.6.0",
@@ -24,22 +26,24 @@
   "main": "main.js",
   "scripts": {
     "start": "react-scripts start",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron": "electron .",
+    "electron": "wait-on http://localhost:3000 && electron .",
     "dev": "concurrently \"npm start\" \"npm run electron\"",
     "build:react": "react-scripts build",
-    "build:electron": "wait-on build/index.html && electron-builder",
+    "build:electron": "electron-builder",
     "build": "npm run build:react && npm run build:electron"
   },
   "build": {
     "appId": "com.textworm.console",
     "files": [
       "build/**/*",
-      "public/electron.js"
+      "main.js",
+      "preload.js"
     ],
     "directories": {
       "buildResources": "assets"
+    },
+    "extraMetadata": {
+      "main": "main.js"
     }
   },
   "eslintConfig": {

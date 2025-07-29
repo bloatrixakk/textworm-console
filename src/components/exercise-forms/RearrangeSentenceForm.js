@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function RearrangeSentenceForm({ index, onChange }) {
+export default function RearrangeSentenceForm({ value, index, onChange }) {
   const [sentence, setSentence] = useState("");
 
   useEffect(() => {
@@ -10,6 +10,10 @@ export default function RearrangeSentenceForm({ index, onChange }) {
       }
     );
   }, [sentence])
+
+  useEffect(() => {
+    setSentence(value.sentence);
+  }, [])
 
   return (
     <div>
