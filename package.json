@@ -17,6 +17,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-log": "^5.4.2",
     "electron-store": "^10.1.0",
     "electron-updater": "^6.6.2",
     "react": "^19.1.0",
@@ -40,12 +41,16 @@
     "releaseType": "release"
   },
   "build": {
+    "compression": "maximum",
     "appId": "com.textworm.console",
     "files": [
       "build/**/*",
       "main.js",
       "preload.js",
-      "updatePreload.js"
+      "updatePreload.js",
+      "!**/*.map",
+      "!**/__tests__/**",
+      "!README.md"
     ],
     "directories": {
       "buildResources": "assets"
@@ -61,6 +66,13 @@
       {
         "from": "build",
         "to": "build"
+      }
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "bloatrixakk",
+        "repo": "textworm-console"
       }
     ]
   },

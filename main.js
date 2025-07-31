@@ -5,6 +5,10 @@ const Store = require("electron-store").default;
 
 const isDev = !app.isPackaged;
 
+const log = require('electron-log');
+autoUpdater.logger = log;
+log.transports.file.level = 'debug';
+
 const store = new Store();
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
@@ -68,6 +72,28 @@ autoUpdater.on("update-available", (info) => {
   showMessage(
     `Update Available! \n v${info.version} will be installed when you close the application.`
   );
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  log.info('Update not available:', info);
+});
+
+autoUpdater.on('error', (err) => {
+  log.error('Error in auto-updater:', err);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  log.info(`Download speed: ${progressObj.bytesPerSecond}`);
+  log.info(`Downloaded ${progressObj.percent}%`);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  log.info('Update downloaded');
+  autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('checking-for-update', () => {
+  log.info('Checking for update...');
 });
 
 // --------- IPC HANDLERS ---------

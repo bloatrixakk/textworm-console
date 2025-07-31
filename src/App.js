@@ -8,6 +8,7 @@ import LoginPage from './Login';
 import { init } from "shared-remote-utils";
 import { DraftProvider } from './context/DraftStorage';
 import TextBrowser from './TextBrowser';
+const pjson = require('../package.json');
 
 const TEXT_EDITOR = "TEXT_EDITOR";
 const CONFIG_MANAGER = "CONFIG_MANAGER";
@@ -84,7 +85,7 @@ function App() {
       </DraftProvider>
       <div style={{ position: "fixed", right: "30px", bottom: "10px", fontSize: "12px" }}>
         <p className='Text'>Warning! drafts aren't saved between app reloads!</p>
-        <p className='Text'>Development build</p>
+        <p className='Text'>Development build {pjson.version}</p>
       </div>
     </div >
   );
