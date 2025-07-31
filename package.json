@@ -1,6 +1,6 @@
 {
   "name": "textworm-console",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Desktop editor for textworm-app",
   "author": "Bloatrix",
   "private": true,
@@ -70,10 +70,9 @@
     ],
     "publish": [
       {
-        "provider": "github",
-        "owner": "bloatrixakk",
-        "repo": "textworm-console"
-      }
+        "provider": "generic",
+        "url": "https://github.com/bloatrixakk/textworm-console/releases/latest/download/"
+      }      
     ]
   },
   "eslintConfig": {

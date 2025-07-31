@@ -2,23 +2,27 @@ import { useEffect, useState } from "react";
 import { handleStateArrChange, removeStateArrElement } from "../../utils/ArrayStateHelpers";
 import OptionsElement from "../OptionElement";
 import AddBtn from "../AddBtn";
+import Dropdown from "../Dropdown";
 
 export default function MultipleChoiceForm({ value, index, onChange }) {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
+  const [answer, setAnswer] = useState("");
 
   useEffect(() => {
     onChange(
       {
         question: question,
-        options: options
+        options: options,
+        answer: answer,
       }
     );
-  }, [options, question])
+  }, [options, question, answer])
 
   useEffect(() => {
     setQuestion(value.question);
     setOptions(value.options);
+    setAnswer(value.answer);
   }, [])
 
   function addBtnClick() {
@@ -28,10 +32,21 @@ export default function MultipleChoiceForm({ value, index, onChange }) {
 
   return (
     <div>
-      <div>
-        {/* TODO: import colors and change here */}
+      <div style={{
+        display: "flex",
+        flexDirection: "row",
+        marginLeft: "15%"
+      }}>
         <text className="Text">{index}</text>
-        <input type="text" placeholder="question..." value={question} onChange={(e) => setQuestion(e.target.value)}></input>
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          marginLeft: "15%"
+        }}>
+          <input type="text" placeholder="question..." value={question} onChange={(e) => setQuestion(e.target.value)}></input>
+          {/* <input type="text" placeholder="answer..." value={answer} onChange={(e) => setAnswer(e.target.value)}></input> */}
+          <Dropdown options={options} selected={answer} onSelect={setAnswer}/>
+        </div>
       </div>
       <div style={{
         display: "flex",

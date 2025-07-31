@@ -6,7 +6,7 @@ export default function OptionsElement({ value, removeCb, onChange, placeholder 
       display: "flex",
       flexDirection: "row"
     }}>
-      <input type="text" placeholder={placeholder? placeholder :"answer..."} value={value} onChange={(e) => onChange(e.target.value)}></input>
+      <input type="text" placeholder={placeholder? placeholder :"option..."} value={value} onChange={(e) => onChange(e.target.value)}></input>
       <RemoveBtn onClick={removeCb} />
     </div>
   );

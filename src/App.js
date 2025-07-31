@@ -83,7 +83,7 @@ function App() {
           }[currScreen]
         }
       </DraftProvider>
-      <div style={{ position: "fixed", right: "30px", bottom: "10px", fontSize: "12px" }}>
+      <div style={{ position: "fixed", right: "30px", bottom: "10px", fontSize: "12px", fontWeight: "bold" }}>
         <p className='Text'>Warning! drafts aren't saved between app reloads!</p>
         <p className='Text'>Development build {pjson.version}</p>
       </div>

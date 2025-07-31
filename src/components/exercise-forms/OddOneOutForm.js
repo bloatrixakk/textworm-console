@@ -2,33 +2,41 @@ import { useEffect, useState } from "react";
 import { handleStateArrChange, removeStateArrElement } from "../../utils/ArrayStateHelpers";
 import OptionsElement from "../OptionElement";
 import AddBtn from "../AddBtn";
+import Dropdown from "../Dropdown";
 
 export default function OddOneOutForm({ value, index, onChange }) {
   const [options, setOptions] = useState(["", "", ""]);
+  const [answer, setAnswer] = useState("");
 
   useEffect(() => {
     onChange(
       {
-        options: options
+        options: options,
+        answer: answer,
       }
     );
-  }, [options])
+  }, [options, answer])
 
   useEffect(() => {
     if (Array.isArray(value?.options)) {
       setOptions(value.options);
     }
+    setAnswer(value.answer);
   }, [])
 
   function addBtnClick() {
-    // setOptions(prev => [...prev, `Answer${options.length + 1}`])
     setOptions(prev => [...prev, ""])
   }
 
   return (
     <div>
-      <div>
+      <div style={{
+        display: "flex",
+        flexDirection: "row",
+        marginLeft: "15%"
+      }}>
         <text className="Text">{index}</text>
+          <Dropdown options={options} selected={answer} onSelect={setAnswer}/>
       </div>
       <div style={{
         display: "flex",

@@ -42,6 +42,8 @@ function createWindow(htmlPath, preloadPath, width = 1000, height = 800) {
   win.once("ready-to-show", () => {
     win.show();
   });
+
+  // win.loadURL("http://localhost:3000/");
 }
 
 app.whenReady().then(() => {
@@ -66,8 +68,9 @@ autoUpdater.on("update-available", (info) => {
 
   function showMessage(message) {
     console.log(message);
-    updateWindow.webContents.send(message);
+    updateWindow.webContents.send("updateMessage", message);
   }
+  
 
   showMessage(
     `Update Available! \n v${info.version} will be installed when you close the application.`
