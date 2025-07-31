@@ -1,41 +1,84 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const Store = require('electron-store').default;
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { autoUpdater } = require("electron-updater");
+const path = require("path");
+const Store = require("electron-store").default;
+
+const isDev = !app.isPackaged;
 
 const store = new Store();
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1000,
-    height: 800,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // preload must be outside src
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-
-  // win.loadURL('http://localhost:3000');
-  win.loadFile(path.join(__dirname, 'build', 'index.html'));
-
-  // win.webContents.openDevTools(); // REMOVE THIS IN PRODUCTION
+function getAssetPath(...paths) {
+  return isDev
+    ? path.join(__dirname, ...paths)
+    : path.join(process.resourcesPath, ...paths);
 }
 
-app.whenReady().then(createWindow);
+function getPreloadPath(file) {
+  return path.join(__dirname, file); // preload lives in app.asar
+}
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+
+function createWindow(htmlPath, preloadPath, width = 1000, height = 800) {
+  const win = new BrowserWindow({
+    width,
+    height,
+    webPreferences: {
+      preload: preloadPath,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    },
+    show: false,
+  });
+
+  win.loadFile(htmlPath);
+
+  win.once("ready-to-show", () => {
+    win.show();
+  });
+}
+
+app.whenReady().then(() => {
+  createWindow(
+    getAssetPath("build", "index.html"),
+    getPreloadPath("preload.js")
+  );
+  autoUpdater.checkForUpdates();
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
+
+autoUpdater.on("update-available", (info) => {
+  const updateWindow = createWindow(
+    getAssetPath("build", "update", "update.html"),
+    getPreloadPath("updatePreload.js"),
+    400,
+    400
+  );
+
+  function showMessage(message) {
+    console.log(message);
+    updateWindow.webContents.send(message);
+  }
+
+  showMessage(
+    `Update Available! \n v${info.version} will be installed when you close the application.`
+  );
 });
 
 // --------- IPC HANDLERS ---------
-ipcMain.handle('save-token', (event, token) => {
-  store.set('authToken', token);
+ipcMain.handle("save-token", (event, token) => {
+  store.set("authToken", token);
 });
 
-ipcMain.handle('get-token', () => {
-  return store.get('authToken') || null;
+ipcMain.handle("get-token", () => {
+  return store.get("authToken") || null;
 });
 
-ipcMain.handle('delete-token', () => {
-  store.delete('authToken');
+ipcMain.handle("delete-token", () => {
+  store.delete("authToken");
 });

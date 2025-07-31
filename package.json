@@ -1,9 +1,10 @@
 {
   "name": "textworm-console",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Desktop editor for textworm-app",
   "author": "Bloatrix",
   "private": true,
+  "homepage": "./",
   "devDependencies": {
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
@@ -17,6 +18,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "electron-store": "^10.1.0",
+    "electron-updater": "^6.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
@@ -32,19 +34,35 @@
     "build:electron": "electron-builder",
     "build": "npm run build:react && npm run build:electron"
   },
+  "repository": "https://github.com/bloatrixakk/textworm-console.git",
+  "publishConfig": {
+    "provider": "github",
+    "releaseType": "release"
+  },
   "build": {
     "appId": "com.textworm.console",
     "files": [
       "build/**/*",
       "main.js",
-      "preload.js"
+      "preload.js",
+      "updatePreload.js"
     ],
     "directories": {
       "buildResources": "assets"
     },
     "extraMetadata": {
       "main": "main.js"
-    }
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/textworm.ico"
+    },
+    "extraResources": [
+      {
+        "from": "build",
+        "to": "build"
+      }
+    ]
   },
   "eslintConfig": {
     "extends": [
