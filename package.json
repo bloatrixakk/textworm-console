@@ -1,6 +1,6 @@
 {
   "name": "textworm-console",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "Desktop editor for textworm-app",
   "author": "Bloatrix",
   "private": true,
@@ -60,7 +60,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/textworm.ico"
+      "icon": "public/bookmark-console.ico"
     },
     "extraResources": [
       {
